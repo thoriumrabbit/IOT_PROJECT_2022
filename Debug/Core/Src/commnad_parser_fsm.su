@@ -1,0 +1,5 @@
+commnad_parser_fsm.c:22:6:command_parser_fsm	8	static
+commnad_parser_fsm.c:69:6:updateBuffer	24	static
+commnad_parser_fsm.c:86:6:clearBuffer	16	static
+commnad_parser_fsm.c:92:9:checkRST	16	static
+commnad_parser_fsm.c:99:9:checkOK	16	static
