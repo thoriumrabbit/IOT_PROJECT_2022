@@ -41,6 +41,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+ADC_HandleTypeDef hadc2;
 
 TIM_HandleTypeDef htim2;
 
@@ -56,6 +57,7 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_ADC2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -96,10 +98,12 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM2_Init();
   MX_USART2_UART_Init();
+  MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
 
-   HAL_ADC_Start(&hadc1);
+  HAL_ADC_Start(&hadc1);
+  HAL_ADC_Start(&hadc2);
 
   HAL_UART_Receive_IT(&huart2, &temp,1);
   /* USER CODE END 2 */
@@ -109,9 +113,10 @@ int main(void)
   while (1)
   {
 	  char str[50];
-	  	ADC_value = HAL_ADC_GetValue(&hadc1);
-	  	HAL_UART_Transmit(&huart2, (uint8_t *)str, sprintf(str, "!ADC=%ld#\r\n", ADC_value), 1000);
-
+	  	ADC_value_RT = HAL_ADC_GetValue(&hadc1);
+	  	HAL_UART_Transmit(&huart2, (uint8_t *)str, sprintf(str, "!1:RT:%ld#\r\n", ADC_value_RT/40), 1000);
+	  	ADC_value_RH = HAL_ADC_GetValue(&hadc2);
+	  	HAL_UART_Transmit(&huart2, (uint8_t *)str, sprintf(str, "!1:RH:%ld#\r\n", ADC_value_RH/40), 1000);
   	  if(buffer_flag == 1||timer1_flag == 1) {
 		  if(buffer_flag == 1){
 			  buffer_flag = 0;
@@ -218,6 +223,51 @@ static void MX_ADC1_Init(void)
 }
 
 /**
+  * @brief ADC2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC2_Init(void)
+{
+
+  /* USER CODE BEGIN ADC2_Init 0 */
+
+  /* USER CODE END ADC2_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC2_Init 1 */
+
+  /* USER CODE END ADC2_Init 1 */
+  /** Common config
+  */
+  hadc2.Instance = ADC2;
+  hadc2.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc2.Init.ContinuousConvMode = ENABLE;
+  hadc2.Init.DiscontinuousConvMode = DISABLE;
+  hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc2.Init.NbrOfConversion = 1;
+  if (HAL_ADC_Init(&hadc2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC2_Init 2 */
+
+  /* USER CODE END ADC2_Init 2 */
+
+}
+
+/**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
@@ -278,7 +328,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -333,8 +383,8 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void Read_Value(){
 	char str[50];
- 	ADC_value = HAL_ADC_GetValue(&hadc1);
-	HAL_UART_Transmit(&huart2, (uint8_t *)str, sprintf(str, "!ADC=%d#\r\n", ADC_value), 1000);
+// 	ADC_value = HAL_ADC_GetValue(&hadc1);
+//	HAL_UART_Transmit(&huart2, (uint8_t *)str, sprintf(str, "!ADC=%d#\r\n", ADC_value), 1000);
 }
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim )
 {
