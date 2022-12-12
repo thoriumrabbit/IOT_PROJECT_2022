@@ -13,4 +13,5 @@ int sensor_flag = 0;
 
 uint8_t temp = 0;
 uint8_t buffer_flag = 1;
-int ADC_value =0;
+int ADC_value_RT =0;
+int ADC_value_RH =0;

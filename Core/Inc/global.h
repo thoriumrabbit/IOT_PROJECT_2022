@@ -36,8 +36,8 @@ extern int sensor_flag;
 
 
 extern uint8_t temp;
-extern int ADC_value;
-
+extern int ADC_value_RT;
+extern int ADC_value_RH;
 
 extern uint8_t buffer [ MAX_BUFFER_SIZE ];
 extern uint8_t index_buffer;
